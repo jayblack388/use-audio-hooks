@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { visEffect } from './useAudioPlayer';
+import { visualization } from '../utils/helpers';
 import { RecorderConfigInterface } from '../types';
 
 interface WorkerWithUrl extends Worker {
@@ -20,8 +20,8 @@ export const useAudioRecorder = (config: RecorderConfigInterface) => {
     setAudioInput,
   ] = useState<MediaStreamAudioSourceNode | null>(null);
   const [audioNode, setAudioNode] = useState<ScriptProcessorNode | null>(null);
-  const [bufferSize, setBufferSize] = useState(4096);
-  const [blob, setBlob] = useState<Blob | null>(null);
+  const [bufferSize /* setBufferSize */] = useState(4096);
+  const [, /* blob */ setBlob] = useState<Blob | null>(null);
   const [duration, setDuration] = useState<number>(0);
   const [microphone, setMicrophone] = useState<MediaStream | null>(null);
   const [recordedData, setRecordedData] = useState<Float32Array[]>([]);
@@ -38,7 +38,7 @@ export const useAudioRecorder = (config: RecorderConfigInterface) => {
       new Blob(
         [
           _function.toString(),
-          ';this.onmessage = function (e) {' + _function.name + '(e.data);}',
+          `;this.onmessage = function(e) {${_function.name}(e.data);}`,
         ],
         {
           type: 'application/javascript',
@@ -50,7 +50,7 @@ export const useAudioRecorder = (config: RecorderConfigInterface) => {
     worker.workerURL = workerURL;
     return worker;
   };
-  const exportWav = (config: any, callback: any) => {
+  function exportWav(config: any, callback: any) {
     function inlineWebWorker(config: any, cb: any) {
       function joinBuffers(channelBuffer: any, count: any) {
         const result = new Float64Array(count);
@@ -65,15 +65,14 @@ export const useAudioRecorder = (config: RecorderConfigInterface) => {
 
         return result;
       }
-      let data = config.data.slice(0);
-      data = joinBuffers(data, config.recordingLength);
-
       function writeUTFBytes(view: any, offset: any, string: string) {
         const lng = string.length;
         for (let i = 0; i < lng; i++) {
           view.setUint8(offset + i, string.charCodeAt(i));
         }
       }
+      const firstData = config.data.slice(0);
+      const data = joinBuffers(firstData, config.recordingLength);
 
       const dataLength = data.length;
 
@@ -96,36 +95,34 @@ export const useAudioRecorder = (config: RecorderConfigInterface) => {
       view.setUint32(40, dataLength * 2, true); // data chunk length
 
       // write the PCM samples
-      var index = 44;
-      for (var i = 0; i < dataLength; i++) {
+      let index = 44;
+      for (let i = 0; i < dataLength; i++) {
         view.setInt16(index, data[i] * 0x7fff, true);
         index += 2;
       }
 
       if (cb) {
-        /* eslint-disable-next-line */
         return cb({
           buffer: buffer,
           view: view,
         });
       }
-
-      ((self as unknown) as WorkerWithUrl).postMessage({
+      self.postMessage({
         buffer: buffer,
         view: view,
       });
     }
-
     const webWorker = processInWebWorker(inlineWebWorker);
 
-    webWorker.onmessage = function(event) {
+    webWorker.onmessage = function messageFn(event) {
       callback(event.data.buffer, event.data.view);
 
       // release memory
       URL.revokeObjectURL(webWorker.workerURL);
     };
+
     webWorker.postMessage(config);
-  };
+  }
   const stopRecording = (callback: (blob: Blob) => void) => {
     setRecording(false);
 
@@ -146,7 +143,8 @@ export const useAudioRecorder = (config: RecorderConfigInterface) => {
         recordingLength,
         data: recordedData,
       },
-      function(buffer: Buffer, view: DataView) {
+      function totallyNecessaryName(buffer: Buffer, view: DataView) {
+        console.log(buffer);
         const newBlob = new Blob([view], { type: 'audio/wav' });
         setBlob(newBlob);
         callback && callback(newBlob);
@@ -182,7 +180,7 @@ export const useAudioRecorder = (config: RecorderConfigInterface) => {
   };
   useEffect(() => {
     if (!canvas || !audioCtx || !audioInput) return;
-    visEffect(canvas, audioCtx, audioInput, config.visualizer, false);
+    visualization(canvas, audioCtx, audioInput, config.visualizer, false);
   });
   useEffect(() => {
     if (duration > 30000) {
@@ -201,7 +199,7 @@ export const useAudioRecorder = (config: RecorderConfigInterface) => {
     };
   }, [audioInput, startDate]);
   useEffect(() => {
-    if (audioNode && audioCtx) {
+    if (audioNode && (audioCtx && audioCtx.state !== 'closed')) {
       audioNode.connect(audioCtx.destination);
       navigator.mediaDevices
         .getUserMedia({ audio: true })
@@ -209,16 +207,13 @@ export const useAudioRecorder = (config: RecorderConfigInterface) => {
         .catch(onMicrophoneError);
     }
     return () => {
-      if (audioNode) {
+      if (audioNode && audioCtx && audioCtx.state === 'closed') {
         audioNode.disconnect();
         setAudioNode(null);
       }
     };
   }, [audioNode]);
   useEffect(() => {
-    // if (!audioCtx) {
-    //   initRecorder();
-    // }
     if (audioCtx && audioCtx.createScriptProcessor) {
       const newNode: ScriptProcessorNode = audioCtx.createScriptProcessor(
         bufferSize,
