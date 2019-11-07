@@ -1,8 +1,12 @@
 {
-  "name": "ico-audio",
+  "name": "use-audio-hooks",
   "version": "1.0.1",
   "license": "MIT",
-  "author": "John Blackwell",
+  "author": {
+    "name": "John Blackwell",
+    "email": "jblackwell072588@gmail.com",
+    "url": "https://johnblackwell.dev"
+  },
   "main": "dist/index.js",
   "module": "dist/ico-audio.esm.js",
   "typings": "dist/index.d.ts",
