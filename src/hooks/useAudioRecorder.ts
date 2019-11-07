@@ -6,7 +6,7 @@ interface WorkerWithUrl extends Worker {
   workerURL: string;
 }
 
-export const useAudioRecorder = (config: RecorderConfigInterface) => {
+export function useAudioRecorder (config: RecorderConfigInterface) {
   const {
     canvas,
     handleStartRecording,

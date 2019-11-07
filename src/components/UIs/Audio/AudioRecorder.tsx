@@ -17,13 +17,12 @@ export const AudioRecorder: FC<AudioRecorderProps> = ({
   setFiles,
   ...props
 }) => {
-  if (!props) return <div />;
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const config: RecorderConfigInterface = {
     canvas: canvasRef && canvasRef.current,
-    // handleStartRecording: () => console.log('starting'),
-    // handleFinishRecording: () => console.log('stopping'),
-    // handleRecording: (miliseconds) => console.log('recording => ', miliseconds),
+    handleStartRecording: () => console.log('starting'),
+    handleFinishRecording: () => console.log('stopping'),
+    handleRecording: (miliseconds) => console.log('recording => ', miliseconds),
     setFiles,
     visualizer: { enabled: true, lineWidth: 5 },
   };
@@ -41,7 +40,6 @@ export const AudioRecorder: FC<AudioRecorderProps> = ({
           }}
         >
           <Microphone height="2.8rem" />
-          {/* <i className="icon-mic-on" /> */}
         </S.RecordButton>
         <S.Visualizer ref={canvasRef} />
       </S.VisualizerContainer>
