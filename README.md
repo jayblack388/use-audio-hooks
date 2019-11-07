@@ -1,5 +1,11 @@
 # Use Audio Hooks
 
+```
+yarn add use-audio-hooks
+// or
+npm install use-audio-hooks
+```
+
 This package expose `useAudioPlayer` and `useAudioRecorder`, as well as several components: `Audio`, `AudioRecorder`, and `AudioPlayer` that use those hooks, as well as the underlying styled components that compose those components.
 
 ## useAudioPlayer
