@@ -17,6 +17,8 @@
     "start": "tsdx watch",
     "build": "tsdx build",
     "test": "tsdx test --env=jsdom",
+    "pg": "cd example/ && yarn start",
+    "bump": "yarn version --patch && git push --follow-tags",
     "lint": "tsdx lint"
   },
   "peerDependencies": {

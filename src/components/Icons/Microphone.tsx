@@ -23,7 +23,7 @@ export const Microphone: FC<IconProps> = ({
     <title>music, sound, volume, mic, microphone, recording</title>
     <g data-name="Layer 20">
       <path
-        fill={color || '#E3AE0C'}
+        fill={color || '#fff'}
         d="M9,17V9A7,7,0,0,1,23,9v8A7,7,0,0,1,9,17Zm15-4v5c0,3.86-3.59,7-8,7s-8-3.14-8-7V13H6v5c0,4.66,3.95,8.5,9,9V28H10v2H22V28H17V27c5.05-.45,9-4.29,9-8.95V13Z"
       />
     </g>
