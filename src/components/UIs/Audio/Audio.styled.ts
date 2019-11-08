@@ -36,7 +36,7 @@ export const FileListItem = styled.button`
   border: none;
   color: #0071bc;
   cursor: pointer;
-  font-size: '0.9rem';
+  font-size: 1.2rem;
   padding: 0.8rem 1.6rem;
   text-decoration-color: #0071bc;
   text-decoration: none;
