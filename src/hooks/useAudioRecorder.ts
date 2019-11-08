@@ -6,7 +6,7 @@ interface WorkerWithUrl extends Worker {
   workerURL: string;
 }
 
-export function useAudioRecorder (config: RecorderConfigInterface) {
+export const useAudioRecorder = (config: RecorderConfigInterface) => {
   const {
     canvas,
     handleStartRecording,
@@ -34,6 +34,9 @@ export function useAudioRecorder (config: RecorderConfigInterface) {
     recording ? stop() : start();
   };
   const processInWebWorker = (_function: any) => {
+    console.log(_function);
+    console.log(_function.name);
+    console.log(_function.toString());
     const workerURL = URL.createObjectURL(
       new Blob(
         [
@@ -102,25 +105,35 @@ export function useAudioRecorder (config: RecorderConfigInterface) {
       }
 
       if (cb) {
+        console.log('has a callback');
+        console.log(cb);
+        console.log(cb.toString());
+        /* eslint-disable-next-line */
         return cb({
           buffer: buffer,
           view: view,
         });
       }
+      console.log('no callback');
+      console.log(self.postMessage);
+      console.log(self.postMessage.toString());
+      /* eslint-disable-next-line */
       self.postMessage({
         buffer: buffer,
         view: view,
       });
     }
+    console.log(inlineWebWorker);
     const webWorker = processInWebWorker(inlineWebWorker);
-
+    console.log('webWorker without onmessage => ', webWorker);
     webWorker.onmessage = function messageFn(event) {
       callback(event.data.buffer, event.data.view);
 
       // release memory
       URL.revokeObjectURL(webWorker.workerURL);
     };
-
+    console.log('webWorker with onmessage => ', webWorker);
+    console.log(config);
     webWorker.postMessage(config);
   }
   const stopRecording = (callback: (blob: Blob) => void) => {
