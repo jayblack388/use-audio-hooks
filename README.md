@@ -6,6 +6,8 @@ yarn add use-audio-hooks
 npm install use-audio-hooks
 ```
 
+[![Netlify Status](https://api.netlify.com/api/v1/badges/d89ca227-5b23-4ca5-9c92-f69636aec318/deploy-status)](https://app.netlify.com/sites/use-audio-demo/deploys)
+
 This package expose `useAudioPlayer` and `useAudioRecorder`, as well as several components: `Audio`, `AudioRecorder`, and `AudioPlayer` that use those hooks, as well as the underlying styled components that compose those components.
 
 ## useAudioPlayer
